@@ -1,8 +1,21 @@
+import os
+import json
 import firebase_admin
 from firebase_admin import db, credentials
+from google.auth.credentials import AnonymousCredentials
 
-# Authenticate to Firebase
-cred = credentials.Certificate("credentials.json")
+# Retrieve Firebase credentials from GitHub Actions secret
+firebase_credentials_json = os.getenv('FIREBASE_CREDENTIALS')
+
+if firebase_credentials_json:
+    # Convert the credentials string from GitHub Actions secret to JSON format
+    cred_dict = json.loads(firebase_credentials_json)
+    cred = credentials.Certificate(cred_dict)
+else:
+    print("Error: Firebase credentials are not set in environment variables.")
+    exit(1)
+
+# Initialize Firebase app with credentials
 firebase_admin.initialize_app(cred, {"databaseURL": "https://qwerty-64a73-default-rtdb.asia-southeast1.firebasedatabase.app/"})
 
 # Creating reference to root node
